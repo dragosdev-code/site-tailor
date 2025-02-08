@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "SiteTailor",
+  "version": "1.0",
+  "description": "Customize your web pages—hide elements and apply presets for a personalized browsing experience.",
+  "side_panel": {
+    "default_path": "index.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["contentScript.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "matches": ["<all_urls>"],
+      "resources": ["contentScript.js"]
+    }
+  ],
+  "permissions": ["sidePanel", "storage"],
+  "action": {
+    "default_title": "Toggle Sidebar"
+  }
+}
