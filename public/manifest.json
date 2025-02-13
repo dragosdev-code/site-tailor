@@ -3,6 +3,10 @@
   "name": "SiteTailor",
   "version": "1.0",
   "description": "Customize your web pages—hide elements and apply presets for a personalized browsing experience.",
+  "icons": { "128": "icon128.png" },
+  "background": {
+    "service_worker": "serviceWorker.js"
+  },
   "side_panel": {
     "default_path": "index.html"
   },
