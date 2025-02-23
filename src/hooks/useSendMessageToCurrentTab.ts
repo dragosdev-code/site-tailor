@@ -6,10 +6,10 @@ export function useSendMessageToCurrentTab() {
   const tabId = useCurrentTabId();
 
   const sendMessage = useCallback(
-    (message: unknown) => {
+    (message: unknown, callback?: (response: any) => void) => {
       if (!IS_EXTENSION_CONTEXT) return;
       if (tabId !== null) {
-        chrome.tabs.sendMessage(tabId, message);
+        chrome.tabs.sendMessage(tabId, message, callback || (() => {}));
       } else {
         console.warn("No active tab ID found.");
       }

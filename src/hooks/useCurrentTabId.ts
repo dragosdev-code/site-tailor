@@ -6,11 +6,25 @@ export function useCurrentTabId(): number | null {
 
   useEffect(() => {
     if (!IS_EXTENSION_CONTEXT) return;
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs && tabs.length > 0 && tabs[0].id !== undefined) {
-        setTabId(tabs[0].id);
-      }
-    });
+
+    // Function to update the tab id
+    const updateTabId = () => {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs && tabs.length > 0 && tabs[0].id !== undefined) {
+          setTabId(tabs[0].id);
+        }
+      });
+    };
+
+    updateTabId();
+
+    chrome.tabs.onActivated.addListener(updateTabId);
+    chrome.tabs.onUpdated.addListener(updateTabId);
+
+    return () => {
+      chrome.tabs.onActivated.removeListener(updateTabId);
+      chrome.tabs.onUpdated.removeListener(updateTabId);
+    };
   }, []);
 
   return tabId;
