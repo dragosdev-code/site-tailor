@@ -3,7 +3,7 @@ import { WebsitesPresets } from "./components/WebsitesPresets";
 import { useHashLocation } from "wouter/use-hash-location";
 import { Layout } from "./layout/Layout";
 import { SettingsPage } from "./components/Settings";
-import { PresetSettings } from "./components/Settings/PresetSettings";
+import { PresetPage } from "./components/PresetPage";
 
 function App() {
   return (
@@ -12,7 +12,7 @@ function App() {
         <Layout>
           <Switch>
             <Route path="/" component={WebsitesPresets} />
-            <Route path="/presets/:id" component={PresetSettings} />
+            <Route path="/presets/:id" component={PresetPage} />
             <Route path="/settings" component={SettingsPage} />
             <Route
               path="/placeholder"

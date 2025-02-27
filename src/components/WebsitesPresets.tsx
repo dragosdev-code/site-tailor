@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useLocation } from "wouter";
 import { IS_EXTENSION_CONTEXT } from "../constants";
@@ -38,7 +38,7 @@ export const WebsitesPresets: React.FC = () => {
   }, []);
 
   // Function to update domain (and favicon data if needed) from active tab.
-  const updateDomainFromActiveTab = () => {
+  const updateDomainFromActiveTab = useCallback(() => {
     console.log("updateDomainFromActiveTab called");
     if (IS_EXTENSION_CONTEXT) {
       sendMessageToCurrentTab({ type: "getFavicon" }, (response) => {
@@ -48,7 +48,7 @@ export const WebsitesPresets: React.FC = () => {
         }
       });
     }
-  };
+  }, [sendMessageToCurrentTab, setValue]);
 
   console.log({ currentTabId });
 
@@ -108,7 +108,7 @@ export const WebsitesPresets: React.FC = () => {
             }
             className="flex items-center gap-2 bg-neutral-600 py-2 px-4 rounded-full hover:cursor-pointer hover:bg-neutral-500 transition"
           >
-            <img src={preset.favicon} className="h-10" />
+            <img src={preset.favicon} className="h-5" />
             <p className="text-lg">{preset.domain}</p>
           </button>
         ))}
