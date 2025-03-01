@@ -1,9 +1,10 @@
 import { Route, Router, Switch } from "wouter";
-import { WebsitesPresets } from "./components/WebsitesPresets";
 import { useHashLocation } from "wouter/use-hash-location";
-import { Layout } from "./layout/Layout";
-import { SettingsPage } from "./components/Settings";
-import { PresetPage } from "./components/PresetPage";
+
+import { WebsitesPresets } from "#/components/WebsitesPresets";
+import { Layout } from "#/layout/Layout";
+import { SettingsPage } from "#/pages/SettingsPage";
+import { PresetPage } from "#/pages/PresetPage";
 
 function App() {
   return (

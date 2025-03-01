@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { IS_EXTENSION_CONTEXT } from "../constants";
+
+import { IS_EXTENSION_CONTEXT } from "#/constants";
 
 export function useCurrentTabId(): number | null {
   const [tabId, setTabId] = useState<number | null>(null);

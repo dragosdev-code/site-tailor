@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useLocation } from "wouter";
-import { IS_EXTENSION_CONTEXT } from "../constants";
-import { useSendMessageToCurrentTab } from "../hooks/useSendMessageToCurrentTab";
-import { useCurrentTabId } from "../hooks/useCurrentTabId";
+
+import { IS_EXTENSION_CONTEXT } from "#/constants";
+import { useSendMessageToCurrentTab } from "#/hooks/useSendMessageToCurrentTab";
+import { useCurrentTabId } from "#/hooks/useCurrentTabId";
 
 export interface Preset {
   id: string;

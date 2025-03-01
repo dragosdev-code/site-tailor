@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { useSendMessageToCurrentTab } from "./useSendMessageToCurrentTab";
-import { IS_EXTENSION_CONTEXT } from "../constants";
+
+import { useSendMessageToCurrentTab } from "#/hooks/useSendMessageToCurrentTab";
+import { IS_EXTENSION_CONTEXT } from "#/constants";
 
 export type RemovalTarget = {
   selector: string;

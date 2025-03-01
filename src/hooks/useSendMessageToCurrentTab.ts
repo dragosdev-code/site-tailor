@@ -1,6 +1,7 @@
 import { useCallback } from "react";
-import { useCurrentTabId } from "./useCurrentTabId";
-import { IS_EXTENSION_CONTEXT } from "../constants";
+
+import { useCurrentTabId } from "#/hooks/useCurrentTabId";
+import { IS_EXTENSION_CONTEXT } from "#/constants";
 
 export function useSendMessageToCurrentTab() {
   const tabId = useCurrentTabId();

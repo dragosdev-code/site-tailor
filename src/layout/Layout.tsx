@@ -1,5 +1,6 @@
 import { PropsWithChildren } from "react";
-import { BottomNavigation } from "../components/BottomNavigation";
+
+import { BottomNavigation } from "#/components/BottomNavigation";
 
 export function Layout({ children }: PropsWithChildren) {
   return (

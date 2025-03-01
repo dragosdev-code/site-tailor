@@ -1,7 +1,8 @@
 import { useLocation } from "wouter";
-import { ClockIcon } from "../icons/ClockIcon";
-import { HomeIcon } from "../icons/HomeIcon";
-import { SettingIcon } from "../icons/SettingIcon";
+
+import { ClockIcon } from "#/icons/ClockIcon";
+import { HomeIcon } from "#/icons/HomeIcon";
+import { SettingIcon } from "#/icons/SettingIcon";
 
 export const BottomNavigation = () => {
   const [location, setLocation] = useLocation();
