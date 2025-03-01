@@ -1,71 +1,39 @@
-import { useState, useEffect } from "react";
-import { ClipboardIcon } from "../icons/ClipboardIcon";
-import { CheckCirlceIcon } from "../icons/CheckCircleIcon";
-import { PencilIcon } from "../icons/PencilIcon";
+import { useState } from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
+
+import { useChromeSyncStorage } from "#/hooks/useChromeSyncStorage";
+import { useCopyToClipboard } from "#/hooks/useCopyToClipboard";
+import { ClipboardIcon } from "#/icons/ClipboardIcon";
+import { CheckCirlceIcon } from "#/icons/CheckCircleIcon";
+import { PencilIcon } from "#/icons/PencilIcon";
+
+type FormValues = {
+  storageJson: string;
+};
 
 export function SettingsPage() {
-  const [storageData, setStorageData] = useState<unknown>(null);
-  const [copySuccess, setCopySuccess] = useState(false);
+  const { stringifiedStorageData, loading, updateStorage, clearStorage } =
+    useChromeSyncStorage();
+  const { copy, copySuccess } = useCopyToClipboard();
   const [isEditing, setIsEditing] = useState(false);
-  const [editedData, setEditedData] = useState("");
-
-  useEffect(() => {
-    if (typeof chrome !== "undefined" && chrome.storage?.sync) {
-      chrome.storage.sync.get(null, (data) => {
-        setStorageData(data);
-        setEditedData(JSON.stringify(data, null, 2));
-      });
-    } else {
-      const err = { error: "chrome.storage.sync not available" };
-      setStorageData(err);
-      setEditedData(JSON.stringify(err, null, 2));
-    }
-  }, []);
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(JSON.stringify(storageData, null, 2));
-      setCopySuccess(true);
-      setTimeout(() => setCopySuccess(false), 2000);
-    } catch (err) {
-      console.error("Failed to copy:", err);
-    }
-  };
-
-  const handleReset = () => {
-    if (typeof chrome !== "undefined" && chrome.storage?.sync) {
-      chrome.storage.sync.clear(() => {
-        console.log("Chrome sync storage cleared");
-        setStorageData({});
-        setEditedData(JSON.stringify({}, null, 2));
-      });
-    } else {
-      console.warn("chrome.storage.sync not available");
-    }
-  };
+  const { register, handleSubmit, reset } = useForm<FormValues>({
+    defaultValues: { storageJson: stringifiedStorageData },
+  });
 
   const handleEdit = () => {
     setIsEditing(true);
   };
 
   const handleCancelEdit = () => {
-    // Revert changes by restoring the last stored storageData
-    setEditedData(JSON.stringify(storageData, null, 2));
+    reset({ storageJson: stringifiedStorageData });
     setIsEditing(false);
   };
 
-  const handleConfirmEdit = () => {
+  const handleConfirmEdit: SubmitHandler<FormValues> = (data) => {
     try {
-      const parsedData = JSON.parse(editedData);
-      if (typeof chrome !== "undefined" && chrome.storage?.sync) {
-        chrome.storage.sync.set(parsedData, () => {
-          console.log("Chrome sync storage updated via edit");
-          setStorageData(parsedData);
-          setIsEditing(false);
-        });
-      } else {
-        console.warn("chrome.storage.sync not available");
-      }
+      const parsedData = JSON.parse(data.storageJson);
+      updateStorage(parsedData);
+      setIsEditing(false);
     } catch (e) {
       console.error("Invalid JSON. Edit not saved.", e);
       alert("Invalid JSON. Please fix the syntax.");
@@ -75,62 +43,78 @@ export function SettingsPage() {
   return (
     <div className="mb-4">
       <h2 className="text-2xl font-bold mb-4">Chrome Sync Storage Data</h2>
-      <div className="relative group">
-        {!isEditing ? (
-          <>
-            <button
-              onClick={handleEdit}
-              className="absolute left-2 top-2 opacity-0 btn-circle btn group-hover:opacity-100 transition"
-              title="Edit"
-            >
-              <PencilIcon />
-            </button>
-            <button
-              onClick={handleCopy}
-              className="absolute right-2 top-2 opacity-0 btn-circle btn group-hover:opacity-100 transition"
-              title={copySuccess ? "Copied!" : "Copy to clipboard"}
-            >
-              <label className="swap swap-flip">
-                <input
-                  type="checkbox"
-                  checked={copySuccess}
-                  readOnly
-                  className="hidden"
+      {loading ? (
+        <div>Loading...</div>
+      ) : (
+        <div>
+          {!isEditing && (
+            <>
+              <div className="relative group">
+                <button
+                  onClick={handleEdit}
+                  className="absolute left-2 top-2 opacity-0 btn-circle btn group-hover:opacity-100 transition"
+                  title="Edit"
+                >
+                  <PencilIcon />
+                </button>
+                <button
+                  onClick={() => copy(stringifiedStorageData)}
+                  className="absolute right-2 top-2 opacity-0 btn-circle btn group-hover:opacity-100 transition"
+                  title={copySuccess ? "Copied!" : "Copy to clipboard"}
+                >
+                  <label className="swap swap-flip">
+                    <input
+                      type="checkbox"
+                      checked={copySuccess}
+                      readOnly
+                      className="hidden"
+                    />
+                    <div className="swap-off">
+                      <ClipboardIcon />
+                    </div>
+                    <div className="swap-on text-green-500">
+                      <CheckCirlceIcon />
+                    </div>
+                  </label>
+                </button>
+                <pre className="bg-gray-800 text-white p-4 rounded-md whitespace-pre-wrap break-all mb-4">
+                  {stringifiedStorageData}
+                </pre>
+              </div>
+              <button
+                onClick={clearStorage}
+                className="btn btn-error group-hover:opacity-100 transition"
+                title="Reset"
+              >
+                Reset everything
+              </button>
+            </>
+          )}
+          {isEditing && (
+            <>
+              <form onSubmit={handleSubmit(handleConfirmEdit)} className="mb-4">
+                <textarea
+                  {...register("storageJson", { required: true })}
+                  className="bg-gray-800 text-white p-4 rounded-md whitespace-pre-wrap break-all w-full"
+                  rows={25}
                 />
-                <div className="swap-off">
-                  <ClipboardIcon />
+                <div className="flex gap-2 mt-2">
+                  <button type="submit" className="btn btn-primary">
+                    Confirm
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleCancelEdit}
+                    className="btn btn-error"
+                  >
+                    Cancel
+                  </button>
                 </div>
-                <div className="swap-on text-green-500">
-                  <CheckCirlceIcon />
-                </div>
-              </label>
-            </button>
-            <pre className="bg-gray-800 text-white p-4 rounded-md whitespace-pre-wrap break-all mb-4">
-              {JSON.stringify(storageData, null, 2)}
-            </pre>
-            <button onClick={handleReset} className="btn btn-error">
-              Reset everything
-            </button>
-          </>
-        ) : (
-          <>
-            <textarea
-              className="bg-gray-800 text-white p-4 rounded-md whitespace-pre-wrap break-all mb-4 w-full"
-              value={editedData}
-              onChange={(e) => setEditedData(e.target.value)}
-              rows={15}
-            />
-            <div className="flex gap-2">
-              <button onClick={handleConfirmEdit} className="btn btn-primary">
-                Confirm
-              </button>
-              <button onClick={handleCancelEdit} className="btn btn-error">
-                Cancel
-              </button>
-            </div>
-          </>
-        )}
-      </div>
+              </form>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }
